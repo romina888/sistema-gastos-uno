@@ -112,15 +112,16 @@ export function ConfiguracionTemplate() {
   );
 }
 
+
 const Container = styled.div`
   min-height: 100vh;
-  padding: 15px;
+  padding: 20px 30px;
   width: 100%;
   background: ${({ theme }) => theme.bgtotal};
   color: ${({ theme }) => theme.text};
   display: grid;
   grid-template:
-    "header" 100px
+    "header" 80px
     "area2" auto;
 
   .header {
@@ -131,25 +132,54 @@ const Container = styled.div`
 
   .area2 {
     grid-area: area2;
+    width: 100%;
+    max-width: 560px;
+    margin: 30px auto;
     display: flex;
-    align-items: center;
     flex-direction: column;
-    justify-content: start;
-    gap: 30px;
-    align-self: center;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 24px;
 
     h1 {
-      font-size: 3rem;
+      width: 100%;
+      font-size: 2rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 0 0 8px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 15px;
+
+    .area2 {
+      margin: 20px auto;
+      gap: 20px;
+
+      h1 {
+        font-size: 1.7rem;
+      }
     }
   }
 `;
 
 const ContentCard = styled.div`
   display: flex;
-  text-align: start;
   align-items: center;
+  justify-content: space-between;
   gap: 20px;
   position: relative;
   width: 100%;
-  justify-content: center;
+  max-width: 440px;
+
+  > span {
+    font-size: 15px;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
 `;

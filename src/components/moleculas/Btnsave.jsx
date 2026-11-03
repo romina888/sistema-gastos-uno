@@ -4,7 +4,7 @@ import { v } from "../../index";
 export function Btnsave({ funcion, titulo, bgcolor, icono }) {
   return (
     <Container
-      type="button"
+      type="submit"
       onClick={funcion}
       $bgcolor={bgcolor || v.colorPrincipal}
     >

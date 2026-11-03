@@ -6,6 +6,7 @@ import {
   ProtectedRoute,
   UserAuth,
   Configuracion,
+  Categorias,
 } from "../index";
 
 export function MyRoutes() {
@@ -19,6 +20,7 @@ export function MyRoutes() {
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/configurar" element={<Configuracion />} />
+          <Route path="/categorias" element={<Categorias />} />
         </Route>
       </Route>
     </Routes>

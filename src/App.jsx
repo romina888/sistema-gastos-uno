@@ -1,7 +1,6 @@
-
 import {MyRoutes} from "./index";
 import React, {createContext, useState} from "react";
-import {Light, Dark, AuthContextProvider, useUsuariosStore} from "./index";
+import {Light, Dark, AuthContextProvider, useUsuariosStore, SpinnerLoader} from "./index";
 import {ThemeProvider} from "styled-components";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useQuery } from "@tanstack/react-query";
@@ -17,7 +16,7 @@ function App() {
     mostrarUsuarios()}
   );
   if (isLoading) {
-    return <h1>Cargando...</h1>;
+    return <SpinnerLoader/>;;
   }
   if (error) {
     return <h1>Error..</h1>;

@@ -1,33 +1,52 @@
+
 import { supabase, ObtenerIdAuthSupabase } from "../index";
 import Swal from "sweetalert2";
+
 export const InsertarUsuarios = async (p) => {
-    try {
-        const {data} = await supabase.from("usuarios").insert(p).select();
-        return data;
-    } catch (error) {
-        console.log(error);
-    }
+  const { data, error } = await supabase
+    .from("usuarios")
+    .upsert(p, {
+      onConflict: "idauth_supabase",
+      ignoreDuplicates: true,
+    })
+    .select();
+
+  if (error) {
+    console.error("Error al insertar usuario:", error);
+    throw error;
+  }
+
+  return data;
 };
+
 export const MostrarUsuarios = async () => {
   try {
     const idAuthSupabase = await ObtenerIdAuthSupabase();
-    const { error, data } = await supabase.from("usuarios").select().eq("idauth_supabase", idAuthSupabase);
-    // if (error) {
-    //   alert("MostrarUsuarios", error);
-    // }
-    if (data) {
-      return data[0];
-    }
+
+    const { error, data } = await supabase
+      .from("usuarios")
+      .select()
+      .eq("idauth_supabase", idAuthSupabase)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    return data;
   } catch (error) {
-    // alert(error.error_description || error.message + "MostrarUsuarios");
+    console.error("Error al mostrar usuario:", error);
+    throw error;
   }
 };
+
 export async function EditarTemaMonedaUser(p) {
   try {
-    const { error } = await supabase.from("usuarios").update(p).eq("id", p.id);
-    if (error) {
-      alert("Error al editar usuarios", error);
-    }
+    const { error } = await supabase
+      .from("usuarios")
+      .update(p)
+      .eq("id", p.id);
+
+    if (error) throw error;
+
     Swal.fire({
       icon: "success",
       title: "Datos modificados",
@@ -35,6 +54,7 @@ export async function EditarTemaMonedaUser(p) {
       timer: 1500,
     });
   } catch (error) {
-    alert(error.error_description || error.message + "EditarTemaMonedaUser");
+    console.error("Error al editar usuario:", error);
+    throw error;
   }
 }
