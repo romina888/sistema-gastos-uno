@@ -28,41 +28,34 @@ export async function InsertarCategorias(p) {
   }
 }
 export async function MostrarCategorias(p) {
-  try {
-    const { data } = await supabase
-      .from("categorias")
-      .select()
-      .eq("idusuario", p.idusuario)
-      .eq("tipo", p.tipo)
-      .order("id", { ascending: false });
-    return data;
-  } catch (error) {}
+  const { data, error } = await supabase
+    .from("categorias")
+    .select()
+    .eq("idusuario", p.idusuario)
+    .eq("tipo", p.tipo)
+    .order("id", { ascending: false });
+
+  if (error) throw error;
+
+  return data;
 }
+
 export async function EliminarCategorias(p) {
-  try {
-    const { error } = await supabase
-      .from("categorias")
-      .delete()
-      .eq("idusuario", p.idusuario)
-      .eq("id", p.id);
-    if (error) {
-      alert("Error al eliminar", error);
-    }
-  } catch (error) {
-    alert(error.error_description || error.message + " eliminar categorias");
-  }
+  const { error } = await supabase
+    .from("categorias")
+    .delete()
+    .eq("idusuario", p.idusuario)
+    .eq("id", p.id);
+
+  if (error) throw error;
 }
+
 export async function EditarCategorias(p) {
-  try {
-    const { error } = await supabase
-      .from("categorias")
-      .update(p)
-      .eq("idusuario", p.idusuario)
-      .eq("id", p.id);
-    if (error) {
-      alert("Error al editar categoria", error);
-    }
-  } catch (error) {
-    alert(error.error_description || error.message + " editar categorias");
-  }
+  const { error } = await supabase
+    .from("categorias")
+    .update(p)
+    .eq("idusuario", p.idusuario)
+    .eq("id", p.id);
+
+  if (error) throw error;
 }

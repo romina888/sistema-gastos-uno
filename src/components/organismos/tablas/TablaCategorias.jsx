@@ -6,33 +6,59 @@ import {
 } from "../../../index";
 import Swal from "sweetalert2";
 import { v } from "../../../styles/variables";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 export function TablaCategorias({
   data,
   SetopenRegistro,
   setdataSelect,
   setAccion,
 }) {
-  const [pagina, setPagina] = useState(1);
-  const [porPagina, setPorPagina] = useState(10);
-  const mx = data.length / porPagina;
-  const maximo = mx < 1 ? 1 : mx;
+const [pagina, setPagina] = useState(1);
+const [porPagina, setPorPagina] = useState(4);
+
+const maximo = Math.max(1, Math.ceil(data.length / porPagina));
+
+useEffect(() => {
+  if (pagina > maximo) {
+    setPagina(maximo);
+  }
+}, [pagina, maximo]);
 
   const { eliminarCategoria } = useCategoriasStore();
   function eliminar(p) {
+
     Swal.fire({
-      title: "¿Estás seguro(a)(e)?",
-      text: "Una vez eliminado, ¡no podrá recuperar este registro!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Si, eliminar",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await eliminarCategoria({ id: p.id, idusuario: p.idusuario });
-      }
-    });
+  title: `¿Estás seguro de eliminar "${p.descripcion}"?`,
+  text: "Una vez eliminada, no podrás recuperar esta categoría.",
+  icon: "warning",
+  showCancelButton: true,
+  confirmButtonColor: "#BF83FF",
+  cancelButtonColor: "#d33",
+  confirmButtonText: "Sí, eliminar",
+  cancelButtonText: "Cancelar",
+}).then(async (result) => {
+  if (result.isConfirmed) {
+    try {
+      await eliminarCategoria({
+        id: p.id,
+        idusuario: p.idusuario,
+      });
+
+      Swal.fire({
+        icon: "success",
+        title: "Categoría eliminada",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "No se pudo eliminar",
+        text: "Ocurrió un error al eliminar la categoría.",
+      });
+    }
+  }
+});
   }
   function editar(data) {
     SetopenRegistro(true);

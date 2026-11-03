@@ -1,50 +1,50 @@
-
-import React, { useState } from "react";
 import { v } from "../../../styles/variables";
 import styled from "styled-components";
 import { useOperaciones } from "../../../index";
 
 export const Paginacion = ({ pagina, setPagina, maximo }) => {
-  const { bgCategoria, colorCategoria } = useOperaciones();
-  const [input, setInput] = useState(1);
+  const { colorCategoria } = useOperaciones();
 
   const nextPage = () => {
-    setInput(parseInt(input) + 1);
-    setPagina(parseInt(pagina) + 1);
+    if (pagina < maximo) {
+      setPagina(pagina + 1);
+    }
   };
 
   const previousPage = () => {
-    setInput(parseInt(input) - 1);
-    setPagina(parseInt(pagina) - 1);
+    if (pagina > 1) {
+      setPagina(pagina - 1);
+    }
   };
 
   const inicio = () => {
-    setInput(1);
     setPagina(1);
   };
 
   return (
-    <Container $bgCategoria={bgCategoria} $colorCategoria={colorCategoria}>
-      <button onClick={inicio}>
+    <Container $colorCategoria={colorCategoria}>
+      <button onClick={inicio} disabled={pagina === 1}>
         <span><v.iconoinicio /></span>
       </button>
 
-      <button disabled={pagina === 1 || pagina < 1} onClick={previousPage}>
-        <span className="iconoIzquierda"><v.iconoFlechabajo /></span>
+      <button onClick={previousPage} disabled={pagina === 1}>
+        <span className="iconoIzquierda">
+          <v.iconoFlechabajo />
+        </span>
       </button>
 
-      <span>{input}</span>
-      <p>de {Math.ceil(maximo)}</p>
+      <span>{pagina}</span>
+      <p>de {maximo}</p>
 
-      <button
-        disabled={pagina >= Math.ceil(maximo)}
-        onClick={nextPage}
-      >
-        <span className="iconoDerecha"><v.iconoFlechabajo /></span>
+      <button onClick={nextPage} disabled={pagina >= maximo}>
+        <span className="iconoDerecha">
+          <v.iconoFlechabajo />
+        </span>
       </button>
     </Container>
   );
 };
+
 
 const Container = styled.div`
   display: flex;
