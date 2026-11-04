@@ -7,64 +7,67 @@ import {
 import Swal from "sweetalert2";
 import { v } from "../../../styles/variables";
 import { useEffect, useState } from "react";
+
 export function TablaCategorias({
   data,
   SetopenRegistro,
   setdataSelect,
   setAccion,
 }) {
-const [pagina, setPagina] = useState(1);
-const [porPagina, setPorPagina] = useState(4);
+  const [pagina, setPagina] = useState(1);
+  const [porPagina, setPorPagina] = useState(4);
 
-const maximo = Math.max(1, Math.ceil(data.length / porPagina));
+  const maximo = Math.max(1, Math.ceil(data.length / porPagina));
 
-useEffect(() => {
-  if (pagina > maximo) {
-    setPagina(maximo);
-  }
-}, [pagina, maximo]);
+  useEffect(() => {
+    if (pagina > maximo) {
+      setPagina(maximo);
+    }
+  }, [pagina, maximo]);
 
   const { eliminarCategoria } = useCategoriasStore();
+
   function eliminar(p) {
-
     Swal.fire({
-  title: `¿Estás seguro de eliminar "${p.descripcion}"?`,
-  text: "Una vez eliminada, no podrás recuperar esta categoría.",
-  icon: "warning",
-  showCancelButton: true,
-  confirmButtonColor: "#BF83FF",
-  cancelButtonColor: "#d33",
-  confirmButtonText: "Sí, eliminar",
-  cancelButtonText: "Cancelar",
-}).then(async (result) => {
-  if (result.isConfirmed) {
-    try {
-      await eliminarCategoria({
-        id: p.id,
-        idusuario: p.idusuario,
-      });
+      title: `¿Estás seguro de eliminar "${p.descripcion}"?`,
+      text: "Una vez eliminada, no podrás recuperar esta categoría.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#BF83FF",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await eliminarCategoria({
+            id: p.id,
+            idusuario: p.idusuario,
+          });
 
-      Swal.fire({
-        icon: "success",
-        title: "Categoría eliminada",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "No se pudo eliminar",
-        text: "Ocurrió un error al eliminar la categoría.",
-      });
-    }
+          Swal.fire({
+            icon: "success",
+            title: "Categoría eliminada",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } catch (error) {
+          Swal.fire({
+            icon: "error",
+            title: "No se pudo eliminar",
+            text: "Ocurrió un error al eliminar la categoría.",
+          });
+        }
+      }
+    });
   }
-});
-  }
+
   function editar(data) {
     SetopenRegistro(true);
     setdataSelect(data);
     setAccion("Editar");
   }
+
   return (
     <>
       <Container>
@@ -113,51 +116,43 @@ useEffect(() => {
     </>
   );
 }
+
 const Container = styled.div`
   position: relative;
+  width: 100%;
+  min-width: 0;
+  margin: 16px 0 24px;
 
-  margin: 5% 3%;
-  @media (min-width: ${v.bpbart}) {
-    margin: 2%;
-  }
-  @media (min-width: ${v.bphomer}) {
-    margin: 2em auto;
-    max-width: ${v.bphomer};
-  }
   .responsive-table {
     width: 100%;
-    margin-bottom: 1.5em;
     border-spacing: 0;
-    @media (min-width: ${v.bpbart}) {
-      font-size: 0.9em;
-    }
-    @media (min-width: ${v.bpmarge}) {
-      font-size: 1em;
-    }
+    margin-bottom: 20px;
+    table-layout: fixed;
+
     thead {
       position: absolute;
-
-      padding: 0;
-      border: 0;
-      height: 1px;
       width: 1px;
+      height: 1px;
       overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+
       @media (min-width: ${v.bpbart}) {
         position: relative;
-        height: auto;
         width: auto;
-        overflow: auto;
+        height: auto;
+        overflow: visible;
+        clip: auto;
       }
+
       th {
         border-bottom: 2px solid rgba(115, 115, 115, 0.32);
         font-weight: normal;
         text-align: center;
         color: ${({ theme }) => theme.text};
-        &:first-of-type {
-          text-align: center;
-        }
+        padding: 12px 8px;
       }
     }
+
     tbody,
     tr,
     th,
@@ -166,91 +161,104 @@ const Container = styled.div`
       padding: 0;
       text-align: left;
       white-space: normal;
+      overflow-wrap: anywhere;
     }
+
     tr {
+      margin-bottom: 14px;
+      border: 1px solid ${({ theme }) => theme.bg4};
+      border-radius: 12px;
+      padding: 10px;
+      background: ${({ theme }) => theme.bg2};
+
       @media (min-width: ${v.bpbart}) {
         display: table-row;
+        margin-bottom: 0;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        
+        /* Agregamos el borde aquí para que abarque toda la fila */
+        border-bottom: 1px solid rgba(161, 161, 161, 0.32); 
       }
     }
 
     th,
     td {
-      padding: 0.5em;
+      padding: 8px;
       vertical-align: middle;
-      @media (min-width: ${v.bplisa}) {
-        padding: 0.75em 0.5em;
-      }
+
       @media (min-width: ${v.bpbart}) {
         display: table-cell;
-        padding: 0.5em;
-      }
-      @media (min-width: ${v.bpmarge}) {
-        padding: 0.75em 0.5em;
-      }
-      @media (min-width: ${v.bphomer}) {
-        padding: 0.75em;
+        padding: 12px 8px;
       }
     }
+
     tbody {
       @media (min-width: ${v.bpbart}) {
         display: table-row-group;
       }
-      tr {
-        margin-bottom: 1em;
+
+      tr:nth-of-type(even) {
         @media (min-width: ${v.bpbart}) {
-          display: table-row;
-          border-width: 1px;
-        }
-        &:last-of-type {
-          margin-bottom: 0;
-        }
-        &:nth-of-type(even) {
-          @media (min-width: ${v.bpbart}) {
-            background-color: rgba(151, 151, 151, 0.12);
-          }
+          background-color: rgba(151, 151, 151, 0.12);
         }
       }
+
       th[scope="row"] {
-        @media (min-width: ${v.bplisa}) {
-          border-bottom: 1px solid rgba(161, 161, 161, 0.32);
-        }
+        color: ${({ theme }) => theme.text};
+
         @media (min-width: ${v.bpbart}) {
-          background-color: transparent;
           text-align: center;
-          color: ${({ theme }) => theme.text};
+          background: transparent;
         }
       }
+
       .Colordiv {
-        text-align: right;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        height: 80px;
+        height: 50px;
+
         @media (min-width: ${v.bpbart}) {
           justify-content: center;
+          height: auto;
         }
       }
+
       td {
         text-align: left;
+
         @media (min-width: ${v.bpbart}) {
-          border-bottom: 1px solid rgba(161, 161, 161, 0.32);
+          /* Quitamos el border-bottom de los td para que no se corte */
+          border-bottom: none; 
           text-align: center;
         }
       }
+
       td[data-title]:before {
         content: attr(data-title);
         float: left;
-        font-size: 0.8em;
-        @media (min-width: ${v.bplisa}) {
-          font-size: 0.9em;
-        }
+        font-size: 0.85em;
+
         @media (min-width: ${v.bpbart}) {
           content: none;
         }
       }
     }
   }
+
+  @media (min-width: ${v.bpbart}) {
+    margin: 20px 0 28px;
+  }
+
+  @media (min-width: ${v.bphomer}) {
+    max-width: 75em;
+    margin: 24px auto;
+  }
 `;
+
 const Colorcontent = styled.div`
   justify-content: center;
   min-height: ${(props) => props.$alto};

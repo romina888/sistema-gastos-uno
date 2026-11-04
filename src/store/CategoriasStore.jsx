@@ -19,7 +19,9 @@ insertarCategorias: async (p) => {
 
 eliminarCategoria: async (p) => {
   await EliminarCategorias(p);
-  await get().mostrarCategorias(p);
+  set({
+    datacategoria: get().datacategoria.filter((c) => c.id !== p.id),
+  });
 },
 
 editarCategoria: async (p) => {

@@ -97,37 +97,59 @@ export function CategoriasTemplate({ data }) {
     </Container>
   );
 }
+
 const Container = styled.div`
-  min-height: 100vh;
-  padding: 15px;
   width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  padding: 12px 16px 24px;
+  overflow-x: hidden;
   background: ${({ theme }) => theme.bgtotal};
   color: ${({ theme }) => theme.text};
+
   display: grid;
   grid-template:
-    "header" 100px
-    "tipo" 100px
-    "area2" 50px
-    "main" auto;
+    "header" auto
+    "tipo" auto
+    "area2" auto
+    "main" 1fr;
+  row-gap: 16px;
 
   .header {
     grid-area: header;
     display: flex;
     align-items: center;
+    min-width: 0;
   }
+
   .tipo {
     grid-area: tipo;
     display: flex;
     align-items: center;
+    min-width: 0;
   }
+
   .area2 {
     grid-area: area2;
     display: flex;
     align-items: center;
-    justify-content: end;
+    justify-content: flex-end;
+    min-width: 0;
   }
+
   .main {
     grid-area: main;
+    min-width: 0;
+    width: 100%;
+  }
+
+  @media (max-width: 48em) {
+    padding: 10px 12px 20px;
+    row-gap: 12px;
+  }
+
+  @media (min-width: 48.01em) {
+    padding: 16px 24px 28px;
   }
 `;
 const ContentFiltro = styled.div`
