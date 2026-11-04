@@ -6,11 +6,6 @@ import {TbPig} from "react-icons/tb"
 
 export const DesplegableUser = [
   {
-    text: "Mi perfil",
-    icono: <v.iconoUser/>,
-    tipo: "miperfil",
-  },
-  {
     text: "Configuracion",
     icono: <v.iconoSettings/>,
     tipo: "configuracion",

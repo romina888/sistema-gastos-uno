@@ -7,6 +7,7 @@ import {
   UserAuth,
   Configuracion,
   Categorias,
+  AcercaDe,
 } from "../index";
 
 export function MyRoutes() {
@@ -21,6 +22,7 @@ export function MyRoutes() {
           <Route path="/" element={<Home />} />
           <Route path="/configurar" element={<Configuracion />} />
           <Route path="/categorias" element={<Categorias />} />
+          <Route path="/acerca-de" element={<AcercaDe />} /> 
         </Route>
       </Route>
     </Routes>

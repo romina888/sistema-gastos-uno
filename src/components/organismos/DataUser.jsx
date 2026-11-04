@@ -1,11 +1,17 @@
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import { UserAuth, BtnCircular, v, ListaMenuDesplegable, DesplegableUser, useAuthStore, } from "../../index";
+
 export function DataUser({ stateConfig }) {
   const { user } = UserAuth();
   const { signOut } = useAuthStore();
+  const navigate = useNavigate();
   const funcionXtipo = async (tipo) => {
     if (tipo === "cerrarsesion") {
       await signOut();
+    }else if (tipo === "configuracion") {
+      navigate("/configurar"); // 👈 3. Agregás la redirección
+      stateConfig.setState(); // 👈 4. Cerramos el menú desplegable al navegar
     }
   };
   return (
