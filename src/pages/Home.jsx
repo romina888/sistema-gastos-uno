@@ -1,12 +1,7 @@
-import styled from "styled-components";
-import { UserAuth } from "../index";
+import { HomeTemplate } from "../index";
+
+// Pantalla de inicio. El saludo y el carrusel están en HomeTemplate.
+// El botón de cerrar sesión y la foto del usuario viven en el sidebar.
 export function Home() {
-  const {user} = UserAuth();
-  return (
-  <Container>
-    <h1>Bienvenido {user.full_name}</h1>
-  </Container>
-  );
+  return <HomeTemplate />;
 }
-// El botón de cerrar sesión y la foto del usuario ahora viven en el sidebar.
-const Container =styled.div``
