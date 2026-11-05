@@ -3,32 +3,22 @@ import styled from "styled-components";
 import { v } from "../../styles/variables";
 import { FaWallet, FaReact, FaDatabase, FaEnvelope } from "react-icons/fa";
 import { SiVite, SiStyledcomponents, SiSupabase } from "react-icons/si";
-import { Header } from "../../index"; // Lo importamos del index global como hacen tus compañeros
+import { Header } from "../../index";
 
 export function AcercaDeTemplate() {
-  // 👇 1. Los mismos estados que usa Categorías
   const [state, setState] = useState(false);
-
-  // 👇 2. La función que abre y cierra el menú
   function openUser() {
     setState(!state);
   }
-
-  // 👇 3. La función que cierra el menú al hacer clic en el fondo
   function cerrarDesplegables() {
     setState(false);
   }
 
   return (
-    // 👇 4. El Container principal con el onClick
     <Container onClick={cerrarDesplegables}>
-      
-      {/* 👇 5. El Header con los mismos props que en Categorías */}
       <header className="header">
         <Header stateConfig={{ state: state, setState: openUser }} />
       </header>
-
-      {/* 👇 6. El contenido de tu sección (envuelto para que no choque con el Container) */}
       <ContenidoAcerca>
         <HeaderSection>
           <LogoContainer>
@@ -84,9 +74,6 @@ export function AcercaDeTemplate() {
   );
 }
 
-// --- ESTILOS ---
-
-// 👇 IMPORTANTE: Le damos la misma estructura que Categorías
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -94,14 +81,12 @@ const Container = styled.div`
   width: 100%;
 
   .header {
-    /* Ajustá este padding según lo que usen en Categorías si querés que sea idéntico */
     padding: 16px 24px; 
     display: flex;
     justify-content: flex-end;
   }
 `;
 
-// Acá metemos el diseño original de Acerca de pero con max-width
 const ContenidoAcerca = styled.div`
   width: 100%;
   max-width: 75em;

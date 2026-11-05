@@ -5,14 +5,12 @@ import { UserAuth } from "../../context/AuthContent";
 import { v } from "../../styles/variables";
 import { Btnsave } from "../moleculas/Btnsave";
 import { Carousel } from "../moleculas/Carousel";
-import { Header } from "../../index"; // 👈 2. Importás el Header
+import { Header } from "../../index";
 
 export function HomeTemplate() {
   const { user } = UserAuth();
   const navigate = useNavigate();
   const nombre = user?.full_name || user?.name || "";
-
-  // 👇 3. Agregás los mismos estados y funciones que en Categorías/Acerca de
   const [state, setState] = useState(false);
 
   function openUser() {
@@ -24,15 +22,10 @@ export function HomeTemplate() {
   }
 
   return (
-    // 👇 4. Envolvés todo en un Container principal con el onClick
     <MainContainer onClick={cerrarDesplegables}>
-      
-      {/* 👇 5. Agregás el header */}
       <header className="header">
         <Header stateConfig={{ state: state, setState: openUser }} />
       </header>
-
-      {/* 👇 6. Tu diseño original va acá adentro */}
       <Container>
         <section className="presentacion">
           <h1>Bienvenido {nombre}</h1>
@@ -64,7 +57,6 @@ const MainContainer = styled.div`
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
-  /* Esto evita que el header se superponga con el scroll */
   position: relative; 
 
   .header {
@@ -72,7 +64,6 @@ const MainContainer = styled.div`
     display: flex;
     justify-content: flex-end;
     width: 100%;
-    /* Lo fijamos arriba a la derecha para que no empuje el contenido */
     position: absolute; 
     top: 0;
     right: 0;
@@ -86,14 +77,13 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   gap: 40px;
-  /* 👇 Esto es clave: forzamos un alto mínimo y centramos */
   min-height: 100vh; 
   width: 100%;
-  padding: 40px 20px; /* Aire a los costados y arriba/abajo */
+  padding: 40px 20px; 
   color: ${({ theme }) => theme.text};
 
   .presentacion {
-    max-width: 450px; /* Un poco más ancho para que respire el texto */
+    max-width: 450px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -120,15 +110,11 @@ const Container = styled.div`
 
   @media (min-width: 48em) {
     flex-direction: row;
-    gap: 60px; /* Reduje un poco el gap para que no se separen tanto */
-    
-    /* 👇 En escritorio, subimos un poco el bloque para que no quede tan abajo */
+    gap: 60px; 
     padding-bottom: 100px; 
-
     .presentacion {
       text-align: left;
     }
-
     .botones {
       justify-content: flex-start;
     }
