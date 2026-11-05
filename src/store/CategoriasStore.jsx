@@ -1,3 +1,4 @@
+/*
 import { create } from "zustand";
 import {
   EditarCategorias,
@@ -28,4 +29,45 @@ editarCategoria: async (p) => {
   await EditarCategorias(p);
   await get().mostrarCategorias(p);
 },
+}));
+*/
+
+import { create } from "zustand";
+import {
+  EditarCategorias,
+  EliminarCategorias,
+  InsertarCategorias,
+  MostrarCategorias,
+} from "../index";
+
+export const useCategoriasStore = create((set, get) => ({
+  datacategoria: [],
+  categoriaItemSelect: null,
+
+  selectCategoria: (p) => {
+    set({ categoriaItemSelect: p });
+  },
+
+  mostrarCategorias: async (p) => {
+    const response = await MostrarCategorias(p);
+    set({ datacategoria: response });
+    return response;
+  },
+
+  insertarCategorias: async (p) => {
+    await InsertarCategorias(p);
+    await get().mostrarCategorias(p);
+  },
+
+  eliminarCategoria: async (p) => {
+    await EliminarCategorias(p);
+    set({
+      datacategoria: get().datacategoria.filter((c) => c.id !== p.id),
+    });
+  },
+
+  editarCategoria: async (p) => {
+    await EditarCategorias(p);
+    await get().mostrarCategorias(p);
+  },
 }));
