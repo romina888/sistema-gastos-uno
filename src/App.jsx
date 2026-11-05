@@ -27,7 +27,6 @@ function App() {
       <ThemeProvider theme={themeStyle}>
         <AuthContextProvider>
           <MyRoutes/>
-        {/* <ReactQueryDevtools initialIsOpen={true} /> */}
         </AuthContextProvider>
 
       </ThemeProvider>

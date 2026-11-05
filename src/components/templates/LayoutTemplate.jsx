@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Outlet, useLocation } from "react-router-dom";
@@ -19,17 +18,13 @@ export function Layout() {
   const [collapsed, setCollapsed] = useState(leerPlegado);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { pathname } = useLocation();
-
-  // Recuerda si el usuario dejó el menú contraído.
   useEffect(() => {
     try {
       localStorage.setItem(CLAVE_PLEGADO, String(collapsed));
     } catch {
-      // Si el navegador no permite guardar, no se recuerda.
     }
   }, [collapsed]);
 
-  // Cierra el menú móvil cuando cambia la ruta.
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);

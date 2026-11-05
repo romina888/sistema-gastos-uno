@@ -7,11 +7,6 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { CarouselData } from "../../utils/dataCarousel";
 
-/**
- * Carrusel de tarjetas apiladas (Swiper con efecto "cards").
- * Se desliza con el dedo, el mouse, las flechas o el teclado.
- *  - slides: lista de tarjetas; por defecto usa CarouselData (utils/dataCarousel.jsx)
- */
 export function Carousel({ slides = CarouselData }) {
   return (
     <Container>

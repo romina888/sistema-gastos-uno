@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { v } from "../../styles/variables";
 
-// Flechas para moverse entre meses (o años) con la etiqueta en el medio.
 export function SelectorPeriodo({
   etiqueta,
   onAnterior,

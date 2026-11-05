@@ -55,7 +55,6 @@ export function MovimientosTemplate({
     [categorias]
   );
 
-  // Los totales cuentan solo los movimientos confirmados; los pendientes se muestran aparte.
   const { ingresos, gastos, balance } = resumen(movimientos.filter(esConfirmado));
   const pendientes = movimientos.filter((m) => !esConfirmado(m)).length;
 
@@ -71,7 +70,6 @@ export function MovimientosTemplate({
 
   const maximo = Math.max(1, Math.ceil(visibles.length / POR_PAGINA));
 
-  // Si cambia el filtro, la búsqueda o el mes, volvemos a la primera página.
   useEffect(() => {
     setPagina(1);
   }, [filtro, busqueda, anio, mes]);

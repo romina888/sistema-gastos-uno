@@ -1,11 +1,6 @@
 import { FaWallet } from "react-icons/fa";
 import { v } from "../styles/variables";
 
-// Tarjetas del carrusel de la pantalla de bienvenida: imágenes con un lema.
-// Para agregar o quitar una tarjeta alcanza con modificar esta lista.
-//  - titulo:  lema que se muestra en la tarjeta
-//  - icono:   ícono (componente de react-icons)
-//  - colores: los dos colores del degradé de fondo
 export const CarouselData = [
   {
     titulo: "Siempre puntual",

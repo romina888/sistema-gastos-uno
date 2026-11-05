@@ -2,8 +2,6 @@ import { create } from "zustand";
 
 const hoy = new Date();
 
-// Guarda el mes que se está mirando, para que Movimientos e Informes
-// muestren siempre el mismo período al navegar entre pantallas.
 export const useMovimientosStore = create((set, get) => ({
   anio: hoy.getFullYear(),
   mes: hoy.getMonth(), // 0 = enero ... 11 = diciembre

@@ -2,6 +2,9 @@ import styled from "styled-components";
 import { v } from "../../../styles/variables";
 
 export function SidebarCard() {
+    const contactarSoporte = () => {
+    window.open("https://wa.me/5491112345678?text=Hola!%20Necesito%20soporte%20con%20Gastos%20-%20UNO", "_blank");
+  };
   return (
     <Container>
       <div className="iconoDecorativo">
@@ -12,7 +15,7 @@ export function SidebarCard() {
 
       <p>¿Necesitás soporte?</p>
 
-      <button type="button">
+      <button type="button" onClick={contactarSoporte}>
         Contactar
       </button>
     </Container>

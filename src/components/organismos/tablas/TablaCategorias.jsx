@@ -178,8 +178,6 @@ const Container = styled.div`
         border: none;
         border-radius: 0;
         background: transparent;
-        
-        /* Agregamos el borde aquí para que abarque toda la fila */
         border-bottom: 1px solid rgba(161, 161, 161, 0.32); 
       }
     }
@@ -231,7 +229,6 @@ const Container = styled.div`
         text-align: left;
 
         @media (min-width: ${v.bpbart}) {
-          /* Quitamos el border-bottom de los td para que no se corte */
           border-bottom: none; 
           text-align: center;
         }

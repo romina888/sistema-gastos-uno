@@ -35,7 +35,7 @@ import {
   RiSunLine,
   RiMoonLine,
 } from "react-icons/ri";
-//import fondo from "../assets/fondo1.svg";
+
 export const v = {
   sidebarWidth: `300px`,
   sidebarWidthInitial: `10vw`,

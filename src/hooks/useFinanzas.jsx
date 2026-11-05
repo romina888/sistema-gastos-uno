@@ -10,7 +10,6 @@ import {
   MostrarTodasCategorias,
 } from "../supabase/crudMovimientos";
 
-// Datos del usuario que se usan en todas las pantallas de finanzas.
 export function useUsuarioFinanzas() {
   const { datausuarios } = useUsuariosStore();
   return {
@@ -18,8 +17,6 @@ export function useUsuarioFinanzas() {
     moneda: datausuarios?.moneda || "$",
   };
 }
-
-// Cuentas del usuario (cada persona tiene al menos una "billetera").
 export function useCuentasUsuario() {
   const { idusuario } = useUsuarioFinanzas();
   return useQuery({
@@ -28,8 +25,6 @@ export function useCuentasUsuario() {
     enabled: !!idusuario,
   });
 }
-
-// Movimientos entre dos fechas ("desde" incluida, "hasta" no incluida).
 export function useMovimientosRango(desde, hasta) {
   const { idusuario } = useUsuarioFinanzas();
   return useQuery({
@@ -39,7 +34,6 @@ export function useMovimientosRango(desde, hasta) {
   });
 }
 
-// Todas las categorías del usuario (gastos e ingresos).
 export function useCategoriasUsuario() {
   const { idusuario } = useUsuarioFinanzas();
   return useQuery({
@@ -58,7 +52,6 @@ function mostrarError(titulo, error) {
   });
 }
 
-// Guardar (crear o editar) y eliminar movimientos, refrescando las listas.
 export function useAccionesMovimientos() {
   const queryClient = useQueryClient();
   const refrescar = () =>

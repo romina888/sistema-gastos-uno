@@ -46,10 +46,7 @@ export function InformesTemplate({
   const [stateUser, setStateUser] = useState(false);
   const [pestania, setPestania] = useState("dona");
   const [tipo, setTipo] = useState("g");
-
-  // Los informes cuentan solo los movimientos confirmados (no los pendientes).
   const movimientos = useMemo(() => todos.filter(esConfirmado), [todos]);
-
   const { ingresos, gastos, balance } = resumen(movimientos);
   const porCategoria = useMemo(
     () => agruparPorCategoria(movimientos, tipo, categorias),

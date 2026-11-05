@@ -1,8 +1,5 @@
 import { supabase } from "./supabase.config";
 
-// En la base, cada usuario tiene una o más "cuentas" (tabla cuenta) y cada
-// movimiento pertenece a una cuenta (columna idcuenta). Por eso, para traer
-// los movimientos de una persona, primero buscamos sus cuentas.
 export async function MostrarCuentas({ idusuario }) {
   const { data, error } = await supabase
     .from("cuenta")
@@ -14,8 +11,6 @@ export async function MostrarCuentas({ idusuario }) {
   return data ?? [];
 }
 
-// Movimientos del usuario entre dos fechas.
-// desde se incluye, hasta NO se incluye (formato "AAAA-MM-DD").
 export async function MostrarMovimientos({ idusuario, desde, hasta }) {
   const cuentas = await MostrarCuentas({ idusuario });
   if (cuentas.length === 0) return [];
@@ -60,8 +55,6 @@ export async function EliminarMovimientos({ id, idcuenta }) {
   if (error) throw error;
 }
 
-// Todas las categorías del usuario (gastos e ingresos), para mostrar
-// nombre, icono y color de cada movimiento.
 export async function MostrarTodasCategorias({ idusuario }) {
   const { data, error } = await supabase
     .from("categorias")

@@ -64,8 +64,6 @@ function opcionesBase(theme, moneda, conEjes) {
   }
   return opciones;
 }
-
-// datos: resultado de agruparPorCategoria()
 export function GraficoDona({ datos, moneda }) {
   const theme = useTheme();
   const data = {
@@ -86,7 +84,6 @@ export function GraficoDona({ datos, moneda }) {
   );
 }
 
-// Balance acumulado día a día.
 export function GraficoLinea({ etiquetas, valores, moneda }) {
   const theme = useTheme();
   const data = {
@@ -110,7 +107,6 @@ export function GraficoLinea({ etiquetas, valores, moneda }) {
   );
 }
 
-// Ingresos y gastos lado a lado.
 export function GraficoBarras({ etiquetas, ingresos, gastos, moneda }) {
   const theme = useTheme();
   const data = {

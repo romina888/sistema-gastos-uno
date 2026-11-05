@@ -1,7 +1,5 @@
 import styled from "styled-components";
 
-// Grupo de botones donde se elige uno solo (como pestañas o filtros).
-// opciones: [{ valor, texto, icono, color }]
 export function Segmentado({ opciones, valor, onChange }) {
   return (
     <Container role="tablist">

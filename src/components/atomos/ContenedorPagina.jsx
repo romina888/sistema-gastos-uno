@@ -1,6 +1,5 @@
 import styled from "styled-components";
 
-// Contenedor común de las pantallas de Movimientos, Informes y Dashboard.
 export const ContenedorPagina = styled.div`
   width: 100%;
   min-width: 0;

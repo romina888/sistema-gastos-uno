@@ -10,8 +10,8 @@ export function DataUser({ stateConfig }) {
     if (tipo === "cerrarsesion") {
       await signOut();
     }else if (tipo === "configuracion") {
-      navigate("/configurar"); // 👈 3. Agregás la redirección
-      stateConfig.setState(); // 👈 4. Cerramos el menú desplegable al navegar
+      navigate("/configurar"); 
+      stateConfig.setState(); 
     }
   };
   return (

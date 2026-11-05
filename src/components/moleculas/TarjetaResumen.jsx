@@ -1,6 +1,4 @@
 import styled from "styled-components";
-
-// Tarjeta con un título chico y un número grande (ej: "Gastos  $ 1.200,00").
 export function TarjetaResumen({ titulo, valor, color, detalle }) {
   return (
     <Container $color={color}>
