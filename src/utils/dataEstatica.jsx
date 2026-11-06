@@ -36,6 +36,7 @@ export const LinksArray = [
   { label: "Home", icon: <v.iconoinicio />, to: "/" },
   { label: "Categorías", icon: <v.iconocategorias />, to: "/categorias" },
   { label: "Movimientos", icon: <v.iconomovimientos />, to: "/movimientos" },
+  { label: "Presupuestos", icon: <v.iconopresupuestos />, to: "/presupuestos" },
   { label: "Informes", icon: <v.iconoreportes />, to: "/informes" },
   { label: "Dashboard", icon: <v.iconolineal />, to: "/dashboard" },
 ];
