@@ -8,6 +8,7 @@ import {
   Configuracion,
   Categorias,
   Movimientos,
+  Presupuestos,
   Informes,
   Dashboard,
   AcercaDe,
@@ -26,6 +27,7 @@ export function MyRoutes() {
           <Route path="/configurar" element={<Configuracion />} />
           <Route path="/categorias" element={<Categorias />} />
           <Route path="/movimientos" element={<Movimientos />} />
+          <Route path="/presupuestos" element={<Presupuestos />} />
           <Route path="/informes" element={<Informes />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/acerca-de" element={<AcercaDe />} /> 
