@@ -36,6 +36,13 @@ export const ContenedorPagina = styled.div`
     gap: 12px;
   }
 
+  .acciones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
   .tarjetas {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));

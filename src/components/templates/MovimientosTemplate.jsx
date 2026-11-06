@@ -11,6 +11,7 @@ import { ContenedorPagina } from "../atomos/ContenedorPagina";
 import { ContentAccionesTabla } from "../organismos/tablas/ContentAccionesTabla";
 import { Paginacion } from "../organismos/tablas/Paginacion";
 import { RegistrarMovimientos } from "../organismos/formularios/RegistrarMovimientos";
+import { exportarCSV, exportarPDF } from "../../utils/exportar";
 import {
   MESES,
   formatearFecha,
@@ -50,6 +51,7 @@ export function MovimientosTemplate({
   const [openRegistro, setOpenRegistro] = useState(false);
   const [accion, setAccion] = useState("Nuevo");
   const [dataSelect, setDataSelect] = useState({});
+  const [exportando, setExportando] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -107,6 +109,24 @@ export function MovimientosTemplate({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Exporta lo que se ve en pantalla (respeta el filtro y el buscador).
+  async function exportar(formato) {
+    const datos = { movimientos: visibles, categoriaPorId, moneda, anio, mes };
+    try {
+      if (formato === "csv") {
+        exportarCSV(datos);
+      } else {
+        setExportando(true);
+        await exportarPDF(datos);
+      }
+    } catch (error) {
+      console.error("Error al exportar", error);
+      alert("No se pudo exportar: " + error.message);
+    } finally {
+      setExportando(false);
+    }
+  }
+
   const pagActual = visibles.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA);
 
   return (
@@ -144,12 +164,30 @@ export function MovimientosTemplate({
           onHoy={onHoy}
           textoHoy="Mes actual"
         />
-        <Btnsave
-          funcion={nuevo}
-          titulo="Nuevo movimiento"
-          icono={<v.agregar />}
-          bgcolor="#DAC1FF"
-        />
+        <div className="acciones">
+          <BotonExportar
+            type="button"
+            disabled={visibles.length === 0}
+            onClick={() => exportar("csv")}
+            title="Descarga una planilla que se abre en Excel"
+          >
+            Exportar CSV
+          </BotonExportar>
+          <BotonExportar
+            type="button"
+            disabled={visibles.length === 0 || exportando}
+            onClick={() => exportar("pdf")}
+            title="Descarga un informe en PDF"
+          >
+            {exportando ? "Generando..." : "Exportar PDF"}
+          </BotonExportar>
+          <Btnsave
+            funcion={nuevo}
+            titulo="Nuevo movimiento"
+            icono={<v.agregar />}
+            bgcolor="#DAC1FF"
+          />
+        </div>
       </div>
 
       <section className="tarjetas">
@@ -242,6 +280,26 @@ export function MovimientosTemplate({
     </ContenedorPagina>
   );
 }
+
+const BotonExportar = styled.button`
+  padding: 10px 16px;
+  font-size: 0.9em;
+  border: 1px solid ${({ theme }) => theme.primary};
+  border-radius: 10px;
+  background: transparent;
+  color: ${({ theme }) => theme.primary};
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover:not(:disabled) {
+    background: ${({ theme }) => theme.primary};
+    color: #18121f;
+  }
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+`;
 
 const Buscador = styled.input`
   flex: 1;
