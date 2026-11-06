@@ -71,4 +71,5 @@ export * from './supabase/supabase.config';
 export * from './utils/Conversiones';
 export * from './utils/dataCarousel';
 export * from './utils/dataEstatica';
+export * from './utils/exportar';
 export * from './utils/finanzas';
