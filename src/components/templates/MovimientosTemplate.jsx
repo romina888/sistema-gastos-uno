@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { v } from "../../styles/variables";
 import { Header } from "../organismos/Header";
 import { Btnsave } from "../moleculas/Btnsave";
@@ -49,6 +50,8 @@ export function MovimientosTemplate({
   const [openRegistro, setOpenRegistro] = useState(false);
   const [accion, setAccion] = useState("Nuevo");
   const [dataSelect, setDataSelect] = useState({});
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const categoriaPorId = useMemo(
     () => new Map(categorias.map((c) => [c.id, c])),
@@ -94,6 +97,15 @@ export function MovimientosTemplate({
     setDataSelect(m);
     setOpenRegistro(true);
   }
+
+  // Si venimos del Home con "Registrar movimiento", abrimos el formulario directo.
+  useEffect(() => {
+    if (location.state?.nuevo) {
+      nuevo();
+      navigate(location.pathname, { replace: true, state: null });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const pagActual = visibles.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA);
 

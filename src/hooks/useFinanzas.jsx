@@ -4,6 +4,7 @@ import { useUsuariosStore } from "../store/UsuariosStore";
 import {
   MostrarCuentas,
   MostrarMovimientos,
+  MostrarUltimosMovimientos,
   InsertarMovimientos,
   EditarMovimientos,
   EliminarMovimientos,
@@ -30,6 +31,16 @@ export function useMovimientosRango(desde, hasta) {
   return useQuery({
     queryKey: ["movimientos", idusuario, desde, hasta],
     queryFn: () => MostrarMovimientos({ idusuario, desde, hasta }),
+    enabled: !!idusuario,
+  });
+}
+
+// Los últimos movimientos cargados (para el Home).
+export function useUltimosMovimientos(limite = 4) {
+  const { idusuario } = useUsuarioFinanzas();
+  return useQuery({
+    queryKey: ["movimientos", "ultimos", idusuario, limite],
+    queryFn: () => MostrarUltimosMovimientos({ idusuario, limite }),
     enabled: !!idusuario,
   });
 }
