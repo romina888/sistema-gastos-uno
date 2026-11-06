@@ -31,6 +31,25 @@ export async function MostrarMovimientos({ idusuario, desde, hasta }) {
   return data ?? [];
 }
 
+// Los últimos movimientos cargados (los más nuevos primero), sin importar la fecha.
+export async function MostrarUltimosMovimientos({ idusuario, limite = 4 }) {
+  const cuentas = await MostrarCuentas({ idusuario });
+  if (cuentas.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from("movimientos")
+    .select()
+    .in(
+      "idcuenta",
+      cuentas.map((c) => c.id)
+    )
+    .order("id", { ascending: false })
+    .limit(limite);
+
+  if (error) throw error;
+  return data ?? [];
+}
+
 export async function InsertarMovimientos(p) {
   const { error } = await supabase.from("movimientos").insert(p);
   if (error) throw error;
