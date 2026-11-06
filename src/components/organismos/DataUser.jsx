@@ -1,9 +1,13 @@
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { UserAuth, BtnCircular, v, ListaMenuDesplegable, DesplegableUser, useAuthStore, } from "../../index";
+import { UserAuth, BtnCircular, v, ListaMenuDesplegable, DesplegableUser, useAuthStore, useUsuariosStore, } from "../../index";
 
 export function DataUser({ stateConfig }) {
   const { user } = UserAuth();
+  const { datausuarios } = useUsuariosStore();
+  // Si la persona editó su perfil, se usa eso; si no, los datos de Google.
+  const foto = datausuarios?.foto || user.picture;
+  const nombre = datausuarios?.nombres || user.name;
   const { signOut } = useAuthStore();
   const navigate = useNavigate();
   const funcionXtipo = async (tipo) => {
@@ -17,7 +21,7 @@ export function DataUser({ stateConfig }) {
   return (
     <Container onClick={stateConfig.setState}>
       <div className="imgContainer">
-        <img src={user.picture} />
+        <img src={foto} alt="" />
       </div>
 
       <BtnCircular
@@ -30,7 +34,7 @@ export function DataUser({ stateConfig }) {
         translateX="-50px"
         translateY="-12px"
       />
-      <span className="nombre">{user.name}</span>
+      <span className="nombre">{nombre}</span>
       {stateConfig.state && (
         <ListaMenuDesplegable
           data={DesplegableUser}

@@ -8,6 +8,7 @@ import {
   ListaGenerica,
   TemasData,
   Btnsave,
+  PerfilUsuario,
 } from "../../index";
 import { useState } from "react";
 
@@ -62,6 +63,8 @@ export function ConfiguracionTemplate() {
 
       <section className="area2">
         <h1>AJUSTES</h1>
+
+        <PerfilUsuario />
 
         <ContentCard>
           <span>Moneda:</span>
