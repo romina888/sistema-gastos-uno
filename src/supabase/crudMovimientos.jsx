@@ -57,12 +57,20 @@ export async function InsertarMovimientos(p) {
 
 export async function EditarMovimientos(p) {
   const { id, idcuenta, ...cambios } = p;
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("movimientos")
     .update(cambios)
     .eq("id", id)
-    .eq("idcuenta", idcuenta);
+    .eq("idcuenta", idcuenta)
+    .select();
   if (error) throw error;
+  // Si Supabase bloquea el UPDATE por permisos (RLS) no da error: simplemente
+  // no modifica ninguna fila. Lo avisamos para no mostrar "guardado" en falso.
+  if (!data || data.length === 0) {
+    throw new Error(
+      "Supabase no actualizó el movimiento (revisá la política de UPDATE de la tabla movimientos)."
+    );
+  }
 }
 
 export async function EliminarMovimientos({ id, idcuenta }) {
@@ -83,4 +91,40 @@ export async function MostrarTodasCategorias({ idusuario }) {
 
   if (error) throw error;
   return data ?? [];
+}
+
+
+// Cuántos movimientos tiene la persona (en todas sus cuentas).
+export async function ContarMovimientos({ idusuario }) {
+  const cuentas = await MostrarCuentas({ idusuario });
+  if (cuentas.length === 0) return 0;
+
+  const { count, error } = await supabase
+    .from("movimientos")
+    .select("id", { count: "exact", head: true })
+    .in(
+      "idcuenta",
+      cuentas.map((c) => c.id)
+    );
+
+  if (error) throw error;
+  return count ?? 0;
+}
+
+// Borra TODOS los movimientos de la persona. Devuelve cuántos se borraron.
+export async function EliminarTodosMovimientos({ idusuario }) {
+  const cuentas = await MostrarCuentas({ idusuario });
+  if (cuentas.length === 0) return 0;
+
+  const { data, error } = await supabase
+    .from("movimientos")
+    .delete()
+    .in(
+      "idcuenta",
+      cuentas.map((c) => c.id)
+    )
+    .select("id");
+
+  if (error) throw error;
+  return data?.length ?? 0;
 }

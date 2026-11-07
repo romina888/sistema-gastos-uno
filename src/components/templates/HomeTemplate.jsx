@@ -1,10 +1,11 @@
 import styled from "styled-components";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaWallet } from "react-icons/fa";
 import { UserAuth } from "../../context/AuthContent";
 import { useUsuariosStore } from "../../store/UsuariosStore";
 import { v } from "../../styles/variables";
+import { Header } from "../organismos/Header";
 import { Btnsave } from "../moleculas/Btnsave";
 import { Carousel } from "../moleculas/Carousel";
 import { TarjetaResumen } from "../moleculas/TarjetaResumen";
@@ -29,6 +30,7 @@ export function HomeTemplate({
   const { user } = UserAuth();
   const { datausuarios } = useUsuariosStore();
   const navigate = useNavigate();
+  const [stateUser, setStateUser] = useState(false);
   const nombre = datausuarios?.nombres || user?.full_name || user?.name || "";
 
   const confirmados = useMemo(
@@ -52,7 +54,13 @@ export function HomeTemplate({
   }
 
   return (
-    <Container>
+    <Container onClick={() => setStateUser(false)}>
+      <header className="cabecera">
+        <Header
+          stateConfig={{ state: stateUser, setState: () => setStateUser(!stateUser) }}
+        />
+      </header>
+
       <section className="hero">
         <div className="presentacion">
           <h1>Bienvenido {nombre}</h1>
@@ -165,7 +173,9 @@ export function HomeTemplate({
                       </strong>
                       <small>
                         {cat?.descripcion ?? "Sin categoría"} · {formatearFecha(m.fecha)}
-                        {!esConfirmado(m) && <em className="pendiente">Pendiente</em>}
+                        {!esConfirmado(m) && <em className="pendiente">
+                            {esIngreso ? "Pendiente de cobro" : "Pendiente de pago"}
+                          </em>}
                       </small>
                     </div>
                     <span className={esIngreso ? "ingreso" : "gasto"}>
@@ -189,6 +199,13 @@ const Container = styled.div`
   width: 100%;
   min-width: 0;
   color: ${({ theme }) => theme.text};
+
+  .cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 0;
+  }
 
   .hero {
     display: flex;
@@ -395,3 +412,4 @@ const Container = styled.div`
     }
   }
 `;
+

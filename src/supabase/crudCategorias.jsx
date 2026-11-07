@@ -16,13 +16,14 @@ export async function InsertarCategorias(p) {
     }
     if (data) {
       Swal.fire({
-        position: "top-end",
         icon: "success",
         title: "Datos guardados",
         showConfirmButton: false,
         timer: 1500,
       });
     }
+    // La categoría recién creada (o null si falló), para poder asignarle un límite.
+    return data?.[0] ?? null;
   } catch (error) {
     alert(error.error_description || error.message + " insertar categorias");
   }
@@ -58,4 +59,28 @@ export async function EditarCategorias(p) {
     .eq("id", p.id);
 
   if (error) throw error;
+}
+
+// Cuántas categorías (de gastos e ingresos) tiene la persona.
+export async function ContarCategorias({ idusuario }) {
+  const { count, error } = await supabase
+    .from("categorias")
+    .select("id", { count: "exact", head: true })
+    .eq("idusuario", idusuario);
+
+  if (error) throw error;
+  return count ?? 0;
+}
+
+// Borra TODAS las categorías de la persona (sus límites se borran en cascada).
+// Devuelve cuántas se borraron.
+export async function EliminarTodasCategorias({ idusuario }) {
+  const { data, error } = await supabase
+    .from("categorias")
+    .delete()
+    .eq("idusuario", idusuario)
+    .select("id");
+
+  if (error) throw error;
+  return data?.length ?? 0;
 }

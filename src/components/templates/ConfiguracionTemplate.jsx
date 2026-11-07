@@ -11,6 +11,7 @@ import {
   PerfilUsuario,
 } from "../../index";
 import { useState } from "react";
+import { ZonaPeligro } from "../organismos/ZonaPeligro";
 
 export function ConfiguracionTemplate() {
   const { datausuarios, editartemamonedauser } = useUsuariosStore();
@@ -110,6 +111,7 @@ export function ConfiguracionTemplate() {
           icono={<v.iconoguardar />}
           funcion={editar}
         />
+        <ZonaPeligro />
       </section>
     </Container>
   );
@@ -117,7 +119,6 @@ export function ConfiguracionTemplate() {
 
 
 const Container = styled.div`
-  min-height: 100vh;
   padding: 20px 30px;
   width: 100%;
   background: ${({ theme }) => theme.bgtotal};

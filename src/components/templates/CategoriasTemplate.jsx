@@ -1,158 +1,108 @@
-import styled from "styled-components";
-import {
-  Header,
-  ContentFiltros,
-  Btndesplegable,
-  useOperaciones,
-  ListaMenuDesplegable,
-  DataDesplegableTipo,
-  Btnfiltro,
-  v,
-  TablaCategorias,
-  RegistrarCategorias
-} from "../../index";
-import { useState } from "react";
-export function CategoriasTemplate({ data }) {
-  const [openRegistro, SetopenRegistro] = useState(false);
-  const [accion, setAccion] = useState("");
-  const [dataSelect, setdataSelect] = useState([]);
-  const [state, setState] = useState(false);
-  const [stateTipo, setStateTipo] = useState(false);
-  const { colorCategoria, tituloBtnDes, bgCategoria, setTipo } =
-    useOperaciones();
-  function cambiarTipo(p) {
-  const opcionSeleccionada = DataDesplegableTipo.find(
-    (item) => item.tipo === p
+import { useMemo, useState } from "react";
+import { v } from "../../styles/variables";
+import { useOperaciones } from "../../store/OperacionesStore";
+import { DataDesplegableTipo } from "../../utils/dataEstatica";
+import { Header } from "../organismos/Header";
+import { Btnsave } from "../moleculas/Btnsave";
+import { Segmentado } from "../moleculas/Segmentado";
+import { ContenedorPagina } from "../atomos/ContenedorPagina";
+import { TablaCategorias } from "../organismos/tablas/TablaCategorias";
+import { RegistrarCategorias } from "../organismos/formularios/RegistrarCategorias";
+
+const TIPOS = [
+  { valor: "g", texto: "Gastos", color: v.colorGastos },
+  { valor: "i", texto: "Ingresos", color: v.colorIngresos },
+];
+
+export function CategoriasTemplate({
+  data = [],
+  presupuestos = [],
+  moneda = "$",
+  cargando = false,
+  error = null,
+}) {
+  const [openRegistro, setOpenRegistro] = useState(false);
+  const [accion, setAccion] = useState("Nuevo");
+  const [dataSelect, setDataSelect] = useState({});
+  const [stateUser, setStateUser] = useState(false);
+  const { tipo, setTipo } = useOperaciones();
+
+  const presupuestoPorCategoria = useMemo(
+    () => new Map(presupuestos.map((p) => [p.idcategoria, p])),
+    [presupuestos]
   );
 
-  if (opcionSeleccionada) {
-    setTipo(opcionSeleccionada);
+  function cambiarTipo(valor) {
+    const opcion = DataDesplegableTipo.find((item) => item.tipo === valor);
+    if (opcion) setTipo(opcion);
   }
 
-  setStateTipo(false);
-  setState(false);
-}
+  function nuevo() {
+    setAccion("Nuevo");
+    setDataSelect({});
+    setOpenRegistro(true);
+  }
 
-  function cerrarDesplegables() {
-    setStateTipo(false);
-    setState(false);
+  function editar(categoria) {
+    setAccion("Editar");
+    setDataSelect(categoria);
+    setOpenRegistro(true);
   }
-  function openTipo() {
-    setStateTipo(!stateTipo);
-    setState(false);
-  }
-  function openUser() {
-    setState(!state);
-    setStateTipo(false);
-  }
-  function nuevoRegistro(){
-    SetopenRegistro(!openRegistro);
-    setAccion("Nuevo")
-    setdataSelect([])
-  }
+
   return (
-    <Container onClick={cerrarDesplegables}>
-      {openRegistro && <RegistrarCategorias dataSelect={dataSelect} onClose={()=>SetopenRegistro(!openRegistro)} accion={accion}/>}
+    <ContenedorPagina onClick={() => setStateUser(false)}>
+      {openRegistro && (
+        <RegistrarCategorias
+          key={`${accion}-${dataSelect.id ?? "nueva"}`}
+          dataSelect={dataSelect}
+          accion={accion}
+          moneda={moneda}
+          presupuesto={presupuestoPorCategoria.get(dataSelect.id)}
+          onClose={() => setOpenRegistro(false)}
+        />
+      )}
 
-      <header className="header">
-        <Header stateConfig={{ state: state, setState: openUser }} />
+      <header className="cabecera">
+        <Header
+          stateConfig={{ state: stateUser, setState: () => setStateUser(!stateUser) }}
+        />
       </header>
 
-      <section className="tipo">
-        <ContentFiltros>
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <Btndesplegable
-              textcolor={colorCategoria}
-              bgcolor={bgCategoria}
-              text={tituloBtnDes}
-              funcion={openTipo}
-            />
-            {stateTipo && (
-              <ListaMenuDesplegable
-                data={DataDesplegableTipo}
-                top="112%"
-                funcion={(p) => cambiarTipo(p)}
-              />
-            )}
-          </div>
-        </ContentFiltros>
-      </section>
-      <section className="area2">
-        <ContentFiltro>
-          <Btnfiltro
-          funcion={nuevoRegistro}
-            bgcolor={bgCategoria}
-            textcolor={colorCategoria}
+      <div className="titulo">
+        <h1>Categorías</h1>
+        <p>
+          Organizá tus ingresos y gastos en categorías. En las de gastos podés
+          poner un límite mensual y te avisamos si lo superás.
+        </p>
+      </div>
+
+      <div className="barra">
+        <Segmentado opciones={TIPOS} valor={tipo} onChange={cambiarTipo} />
+        <div className="acciones">
+          <Btnsave
+            funcion={nuevo}
+            titulo="Nueva categoría"
             icono={<v.agregar />}
+            bgcolor="#DAC1FF"
           />
-        </ContentFiltro>
+        </div>
+      </div>
+
+      <section className="panel">
+        {error ? (
+          <p className="error">No se pudieron cargar las categorías: {error.message}</p>
+        ) : cargando && data.length === 0 ? (
+          <p className="vacio">Cargando categorías...</p>
+        ) : (
+          <TablaCategorias
+            data={data}
+            tipo={tipo}
+            moneda={moneda}
+            presupuestoPorCategoria={presupuestoPorCategoria}
+            onEditar={editar}
+          />
+        )}
       </section>
-      <section className="main">
-        <TablaCategorias data={data} SetopenRegistro={SetopenRegistro} setdataSelect={setdataSelect} setAccion={setAccion}/>
-      </section>
-    </Container>
+    </ContenedorPagina>
   );
 }
-
-const Container = styled.div`
-  width: 100%;
-  min-width: 0;
-  min-height: 100%;
-  padding: 12px 16px 24px;
-  overflow-x: hidden;
-  background: ${({ theme }) => theme.bgtotal};
-  color: ${({ theme }) => theme.text};
-
-  display: grid;
-  grid-template:
-    "header" auto
-    "tipo" auto
-    "area2" auto
-    "main" 1fr;
-  row-gap: 16px;
-
-  .header {
-    grid-area: header;
-    display: flex;
-    align-items: center;
-    min-width: 0;
-  }
-
-  .tipo {
-    grid-area: tipo;
-    display: flex;
-    align-items: center;
-    min-width: 0;
-  }
-
-  .area2 {
-    grid-area: area2;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    min-width: 0;
-  }
-
-  .main {
-    grid-area: main;
-    min-width: 0;
-    width: 100%;
-  }
-
-  @media (max-width: 48em) {
-    padding: 10px 12px 20px;
-    row-gap: 12px;
-  }
-
-  @media (min-width: 48.01em) {
-    padding: 16px 24px 28px;
-  }
-`;
-const ContentFiltro = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-`;

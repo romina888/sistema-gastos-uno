@@ -27,6 +27,7 @@ const FILTROS = [
   { valor: "t", texto: "Todos" },
   { valor: "g", texto: "Gastos", color: v.colorGastos },
   { valor: "i", texto: "Ingresos", color: v.colorIngresos },
+  { valor: "p", texto: "Pendientes", color: "#9E9E9E" },
 ];
 
 export function MovimientosTemplate({
@@ -34,7 +35,6 @@ export function MovimientosTemplate({
   mes,
   onAnterior,
   onSiguiente,
-  onHoy,
   movimientos,
   categorias,
   cargando,
@@ -61,12 +61,32 @@ export function MovimientosTemplate({
   );
 
   const { ingresos, gastos, balance } = resumen(movimientos.filter(esConfirmado));
-  const pendientes = movimientos.filter((m) => !esConfirmado(m)).length;
+  const listaPendientes = movimientos.filter((m) => !esConfirmado(m));
+  const pendientes = listaPendientes.length;
+  const sumar = (lista) => lista.reduce((suma, m) => suma + Number(m.valor), 0);
+  const pendGastos = listaPendientes.filter((m) => m.tipo === "g");
+  const pendIngresos = listaPendientes.filter((m) => m.tipo === "i");
+  const filasPendientes = [
+    pendGastos.length > 0 && {
+      texto: `A pagar · ${pendGastos.length} ${pendGastos.length === 1 ? "gasto" : "gastos"}`,
+      valor: `- ${formatearMonto(sumar(pendGastos), moneda)}`,
+      color: v.colorGastos,
+    },
+    pendIngresos.length > 0 && {
+      texto: `A cobrar · ${pendIngresos.length} ${pendIngresos.length === 1 ? "ingreso" : "ingresos"}`,
+      valor: `+ ${formatearMonto(sumar(pendIngresos), moneda)}`,
+      color: v.colorIngresos,
+    },
+  ].filter(Boolean);
 
   const visibles = useMemo(() => {
     const texto = busqueda.trim().toLowerCase();
     return movimientos.filter((m) => {
-      if (filtro !== "t" && m.tipo !== filtro) return false;
+      if (filtro === "p") {
+        if (esConfirmado(m)) return false;
+      } else if (filtro !== "t" && m.tipo !== filtro) {
+        return false;
+      }
       if (!texto) return true;
       const nombreCategoria = categoriaPorId.get(m.idcategoria)?.descripcion ?? "";
       return `${m.descripcion ?? ""} ${nombreCategoria}`.toLowerCase().includes(texto);
@@ -161,8 +181,6 @@ export function MovimientosTemplate({
           etiqueta={`${MESES[mes]} ${anio}`}
           onAnterior={onAnterior}
           onSiguiente={onSiguiente}
-          onHoy={onHoy}
-          textoHoy="Mes actual"
         />
         <div className="acciones">
           <BotonExportar
@@ -209,8 +227,9 @@ export function MovimientosTemplate({
         {pendientes > 0 && (
           <TarjetaResumen
             titulo="Pendientes"
-            valor={String(pendientes)}
+            filas={filasPendientes}
             color="#9E9E9E"
+            insignia={`${pendientes} ${pendientes === 1 ? "pendiente" : "pendientes"}`}
             detalle="No se suman a los totales hasta confirmarlos"
           />
         )}
@@ -239,6 +258,8 @@ export function MovimientosTemplate({
           <p className="vacio">
             {movimientos.length === 0
               ? "No hay movimientos en este mes. Tocá “Nuevo movimiento” para agregar el primero."
+              : filtro === "p" && !busqueda.trim()
+              ? "No tenés movimientos pendientes en este mes."
               : "No hay movimientos que coincidan con el filtro."}
           </p>
         ) : (
@@ -259,7 +280,9 @@ export function MovimientosTemplate({
                       <strong>{m.descripcion || cat?.descripcion || "Sin descripción"}</strong>
                       <small>
                         {cat?.descripcion ?? "Sin categoría"} · {formatearFecha(m.fecha)}
-                        {!esConfirmado(m) && <em className="pendiente">Pendiente</em>}
+                        {!esConfirmado(m) && <em className="pendiente">
+                          {esIngreso ? "Pendiente de cobro" : "Pendiente de pago"}
+                        </em>}
                       </small>
                     </div>
                     <span className={`monto ${esIngreso ? "ingreso" : "gasto"}`}>

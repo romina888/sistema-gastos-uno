@@ -8,5 +8,6 @@ export function Configuracion() {
   );
 }
 const Container = styled.main`
- height: 100vh;
+ width: 100%;
+ min-width: 0;
 `;

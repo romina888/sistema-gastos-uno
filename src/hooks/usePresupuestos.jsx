@@ -31,7 +31,6 @@ export function useAccionesPresupuestos() {
       await GuardarPresupuesto({ idusuario, idcategoria, monto });
       await refrescar();
       Swal.fire({
-        position: "top-end",
         icon: "success",
         title: "Límite guardado",
         showConfirmButton: false,

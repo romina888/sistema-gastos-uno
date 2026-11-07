@@ -13,8 +13,9 @@ export const useCategoriasStore = create((set, get) => ({
     return response;
   },
 insertarCategorias: async (p) => {
-  await InsertarCategorias(p);
+  const nueva = await InsertarCategorias(p);
   await get().mostrarCategorias(p);
+  return nueva;
 },
 
 eliminarCategoria: async (p) => {

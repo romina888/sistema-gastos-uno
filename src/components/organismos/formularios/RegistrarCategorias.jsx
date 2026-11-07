@@ -10,10 +10,23 @@ import {
   useCategoriasStore,
 } from "../../../index";
 import { useForm } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
+import Swal from "sweetalert2";
+import {
+  EliminarPresupuesto,
+  GuardarPresupuesto,
+} from "../../../supabase/crudPresupuestos";
 import { CirclePicker } from "react-color";
 import Emojipicker from "emoji-picker-react";
 
-export function RegistrarCategorias({ onClose, dataSelect, accion }) {
+export function RegistrarCategorias({
+  onClose,
+  dataSelect,
+  accion,
+  presupuesto,
+  moneda = "$",
+}) {
+  const queryClient = useQueryClient();
   const { insertarCategorias, editarCategoria } = useCategoriasStore();
   const { datausuarios } = useUsuariosStore();
   const [showPicker, setShowPicker] = useState(false);
@@ -34,7 +47,38 @@ export function RegistrarCategorias({ onClose, dataSelect, accion }) {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm();
+  } = useForm({
+    defaultValues: { limite: presupuesto ? String(presupuesto.monto) : "" },
+  });
+
+  // Crea, cambia o quita el límite mensual (solo categorías de gastos).
+  async function guardarLimite(idcategoria, valor) {
+    if (tipo !== "g" || !idcategoria) return;
+    const texto = String(valor ?? "").trim();
+    try {
+      if (texto) {
+        await GuardarPresupuesto({
+          idusuario: datausuarios.id,
+          idcategoria,
+          monto: Number(texto),
+        });
+      } else if (presupuesto) {
+        await EliminarPresupuesto({
+          id: presupuesto.id,
+          idusuario: datausuarios.id,
+        });
+      }
+      await queryClient.invalidateQueries({ queryKey: ["presupuestos"] });
+    } catch (error) {
+      console.error("No se pudo guardar el límite", error);
+      Swal.fire({
+        icon: "error",
+        title: "La categoría se guardó, pero no el límite",
+        text: error?.message || "Probá de nuevo desde Presupuestos.",
+      });
+    }
+  }
+
   async function insertar(data) {
     if (accion === "Editar") {
       const p = {
@@ -48,6 +92,8 @@ export function RegistrarCategorias({ onClose, dataSelect, accion }) {
       try {
         setEstadoproceso(true);
         await editarCategoria(p);
+        await guardarLimite(dataSelect.id, data.limite);
+        queryClient.invalidateQueries({ queryKey: ["categorias-usuario"] });
         setEstadoproceso(false);
         onClose();
       } catch (error) {}
@@ -61,7 +107,9 @@ export function RegistrarCategorias({ onClose, dataSelect, accion }) {
       };
       try {
         setEstadoproceso(true);
-        await insertarCategorias(p);
+        const nueva = await insertarCategorias(p);
+        if (nueva) await guardarLimite(nueva.id, data.limite);
+        queryClient.invalidateQueries({ queryKey: ["categorias-usuario"] });
         setEstadoproceso(false);
 
         onClose();
@@ -106,6 +154,24 @@ export function RegistrarCategorias({ onClose, dataSelect, accion }) {
                 style={{ textTransform: "capitalize" }}
               />
             </div>
+            {tipo === "g" && (
+              <label className="limite">
+                <span>Límite mensual ({moneda}) · opcional</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  inputMode="decimal"
+                  placeholder="Sin límite"
+                  {...register("limite", {
+                    validate: (x) =>
+                      !x || Number(x) > 0 || "El límite debe ser mayor a 0",
+                  })}
+                />
+                {errors.limite && <p>{errors.limite.message}</p>}
+                <small>Si lo superás con un gasto, te avisamos.</small>
+              </label>
+            )}
             <div className="colorContainer">
               <ContentTitle>
                 {<v.paletacolores />}
@@ -190,6 +256,34 @@ const Container = styled.div`
           .colorPickerContent {
             padding-top: 15px;
             min-height: 50px;
+          }
+        }
+        .limite {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+
+          > span {
+            font-size: 0.85em;
+            color: ${({ theme }) => theme.colorSubtitle};
+          }
+          input {
+            background: ${({ theme }) => theme.bgtotal};
+            font-size: 16px;
+            padding: 10px 10px 10px 5px;
+            width: 100%;
+            border: none;
+            border-bottom: solid 1px grey;
+            color: ${({ theme }) => theme.text};
+            outline: none;
+          }
+          small {
+            font-size: 12px;
+            color: ${({ theme }) => theme.colorSubtitle};
+          }
+          p {
+            color: #ff6d00;
+            font-size: 12px;
           }
         }
       }
