@@ -12,6 +12,7 @@ import {
 import { useForm } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
 import Swal from "sweetalert2";
+import { mensajeErrorCategoria } from "../../../supabase/crudCategorias";
 import {
   EliminarPresupuesto,
   GuardarPresupuesto,
@@ -27,7 +28,7 @@ export function RegistrarCategorias({
   moneda = "$",
 }) {
   const queryClient = useQueryClient();
-  const { insertarCategorias, editarCategoria } = useCategoriasStore();
+  const { insertarCategorias, editarCategoria, datacategoria } = useCategoriasStore();
   const { datausuarios } = useUsuariosStore();
   const [showPicker, setShowPicker] = useState(false);
   const [emojiselect, setEmojiselect] = useState("😻");
@@ -45,6 +46,7 @@ export function RegistrarCategorias({
 
   const {
     register,
+    setError,
     formState: { errors },
     handleSubmit,
   } = useForm({
@@ -79,7 +81,28 @@ export function RegistrarCategorias({
     }
   }
 
+  // Sin tildes ni mayúsculas, para comparar "Comida" con " comida ".
+  const normalizar = (t) =>
+    String(t ?? "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
   async function insertar(data) {
+    const repetida = datacategoria.some(
+      (c) =>
+        c.id !== dataSelect.id &&
+        normalizar(c.descripcion) === normalizar(data.descripcion)
+    );
+    if (repetida) {
+      setError("descripcion", {
+        type: "duplicada",
+        message: `Ya tenés una categoría de ${tipo === "g" ? "gastos" : "ingresos"} con ese nombre.`,
+      });
+      return;
+    }
+
     if (accion === "Editar") {
       const p = {
         descripcion: data.descripcion,
@@ -96,7 +119,15 @@ export function RegistrarCategorias({
         queryClient.invalidateQueries({ queryKey: ["categorias-usuario"] });
         setEstadoproceso(false);
         onClose();
-      } catch (error) {}
+      } catch (error) {
+        setEstadoproceso(false);
+        Swal.fire({
+          icon: "error",
+          title: "No se pudo guardar la categoría",
+          text: mensajeErrorCategoria(error, data.descripcion),
+          confirmButtonColor: "#BF83FF",
+        });
+      }
     } else {
       const p = {
         descripcion: data.descripcion,
@@ -108,7 +139,12 @@ export function RegistrarCategorias({
       try {
         setEstadoproceso(true);
         const nueva = await insertarCategorias(p);
-        if (nueva) await guardarLimite(nueva.id, data.limite);
+        if (!nueva) {
+          // No se creó (ya se mostró el motivo): dejamos el formulario abierto.
+          setEstadoproceso(false);
+          return;
+        }
+        await guardarLimite(nueva.id, data.limite);
         queryClient.invalidateQueries({ queryKey: ["categorias-usuario"] });
         setEstadoproceso(false);
 

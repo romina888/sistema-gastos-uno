@@ -1,5 +1,15 @@
 import { supabase } from "../index";
 import Swal from "sweetalert2";
+// Código de Postgres para "valor duplicado" (restricción unique).
+export const ERROR_DUPLICADO = "23505";
+
+export function mensajeErrorCategoria(error, descripcion) {
+  if (error?.code === ERROR_DUPLICADO) {
+    return `Ya existe una categoría llamada "${descripcion}". Probá con otro nombre.`;
+  }
+  return error?.message || "Ocurrió un error inesperado.";
+}
+
 export async function InsertarCategorias(p) {
   try {
     const { data, error } = await supabase
@@ -9,23 +19,31 @@ export async function InsertarCategorias(p) {
     if (error) {
       Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: "Ya existe un registro con " + p.descripcion,
-        footer: '<a href="">Agregue una nueva descripcion</a>',
+        title:
+          error.code === ERROR_DUPLICADO
+            ? "Esa categoría ya existe"
+            : "No se pudo crear la categoría",
+        text: mensajeErrorCategoria(error, p.descripcion),
+        confirmButtonColor: "#BF83FF",
       });
+      return null;
     }
-    if (data) {
-      Swal.fire({
-        icon: "success",
-        title: "Datos guardados",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    }
-    // La categoría recién creada (o null si falló), para poder asignarle un límite.
+    Swal.fire({
+      icon: "success",
+      title: "Datos guardados",
+      showConfirmButton: false,
+      timer: 1500,
+    });
+    // La categoría recién creada, para poder asignarle un límite.
     return data?.[0] ?? null;
   } catch (error) {
-    alert(error.error_description || error.message + " insertar categorias");
+    Swal.fire({
+      icon: "error",
+      title: "No se pudo crear la categoría",
+      text: mensajeErrorCategoria(error, p.descripcion),
+      confirmButtonColor: "#BF83FF",
+    });
+    return null;
   }
 }
 export async function MostrarCategorias(p) {

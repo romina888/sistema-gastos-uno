@@ -70,9 +70,15 @@ function mostrarError(titulo, error) {
   });
 }
 
-// Antes de guardar un gasto confirmado, mira si con ese monto la categoría
-// supera el límite mensual que tiene definido. Devuelve los datos para el
-// aviso, o null si no hay nada que avisar. Si algo falla, no bloquea el guardado.
+// Porcentaje del límite a partir del cual se avisa que ya estás cerca.
+const UMBRAL_AVISO = 0.8;
+
+// Antes de guardar un gasto confirmado, mira cómo queda la categoría respecto de
+// su límite mensual. Devuelve los datos para el aviso, o null si no hay nada que
+// avisar:
+//  - tipo "superado": con este gasto te pasás del límite.
+//  - tipo "cerca": con este gasto llegás al 80 % (se avisa una sola vez, al cruzarlo).
+// Si algo falla, no bloquea el guardado.
 async function revisarLimite({ p, esEdicion, idusuario, moneda }) {
   try {
     if (p.tipo !== "g" || String(p.estado) !== ESTADO_CONFIRMADO) return null;
@@ -102,16 +108,23 @@ async function revisarLimite({ p, esEdicion, idusuario, moneda }) {
         .reduce((s, m) => s + Number(m.valor), 0) + Number(p.valor);
 
     const limite = Number(presupuesto.monto);
-    if (despues <= limite || despues <= antes) return null;
+    const umbral = limite * UMBRAL_AVISO;
+    let tipoAviso = null;
+    if (despues > limite && despues > antes) tipoAviso = "superado";
+    else if (despues <= limite && despues >= umbral && antes < umbral) tipoAviso = "cerca";
+    if (!tipoAviso) return null;
 
     const categorias = await MostrarTodasCategorias({ idusuario });
     const categoria = categorias.find((c) => String(c.id) === String(p.idcategoria));
     return {
+      tipo: tipoAviso,
       categoria: categoria?.descripcion ?? "esta categoría",
       mes: `${MESES[mesNumero - 1].toLowerCase()} de ${anio}`,
       gastado: formatearMonto(despues, moneda),
       limite: formatearMonto(limite, moneda),
       exceso: formatearMonto(despues - limite, moneda),
+      restante: formatearMonto(limite - despues, moneda),
+      porcentaje: Math.round((despues / limite) * 100),
     };
   } catch (error) {
     console.error("No se pudo revisar el límite de la categoría", error);
@@ -136,11 +149,19 @@ export function useAccionesMovimientos() {
       if (esEdicion) await EditarMovimientos(p);
       else await InsertarMovimientos(p);
       await refrescar();
-      if (aviso) {
+      if (aviso?.tipo === "superado") {
         Swal.fire({
           icon: "warning",
           title: "Superaste el límite mensual",
           html: `Con este gasto, <b>${aviso.categoria}</b> llega a <b>${aviso.gastado}</b> en ${aviso.mes}, y el límite es de ${aviso.limite}.<br/>Te pasaste por <b>${aviso.exceso}</b>.`,
+          confirmButtonText: "Entendido",
+          confirmButtonColor: "#BF83FF",
+        });
+      } else if (aviso?.tipo === "cerca") {
+        Swal.fire({
+          icon: "info",
+          title: `Ya usaste el ${aviso.porcentaje} % del límite`,
+          html: `En <b>${aviso.categoria}</b> llevás <b>${aviso.gastado}</b> de ${aviso.limite} en ${aviso.mes}.<br/>Te quedan <b>${aviso.restante}</b>.`,
           confirmButtonText: "Entendido",
           confirmButtonColor: "#BF83FF",
         });

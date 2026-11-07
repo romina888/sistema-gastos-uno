@@ -28,6 +28,9 @@ export function InputText({
           <p>Campo requerido</p>
         
       )}
+      {errors.descripcion?.type === "duplicada" && (
+        <p>{errors.descripcion.message}</p>
+      )}
       {errors.descripcion?.type === "minLength" && (
      
 <p>Debe tener al menos 2 caracteres</p>

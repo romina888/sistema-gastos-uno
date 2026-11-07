@@ -13,6 +13,7 @@ import { Paginacion } from "../organismos/tablas/Paginacion";
 import { RegistrarMovimientos } from "../organismos/formularios/RegistrarMovimientos";
 import { exportarCSV, exportarPDF } from "../../utils/exportar";
 import {
+  ESTADO_CONFIRMADO,
   MESES,
   formatearFecha,
   esConfirmado,
@@ -52,6 +53,7 @@ export function MovimientosTemplate({
   const [accion, setAccion] = useState("Nuevo");
   const [dataSelect, setDataSelect] = useState({});
   const [exportando, setExportando] = useState(false);
+  const [marcandoId, setMarcandoId] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -121,13 +123,37 @@ export function MovimientosTemplate({
   }
 
   // Si venimos del Home con "Registrar movimiento", abrimos el formulario directo.
+  // Si venimos con "Ver pendientes", dejamos el filtro de pendientes puesto.
   useEffect(() => {
     if (location.state?.nuevo) {
       nuevo();
       navigate(location.pathname, { replace: true, state: null });
+    } else if (location.state?.filtro) {
+      setFiltro(location.state.filtro);
+      navigate(location.pathname, { replace: true, state: null });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Pasa un movimiento pendiente a pagado / cobrado sin abrir el formulario.
+  async function confirmar(m) {
+    if (marcandoId) return;
+    setMarcandoId(m.id);
+    await guardar(
+      {
+        id: m.id,
+        idcuenta: m.idcuenta,
+        tipo: m.tipo,
+        valor: Number(m.valor),
+        fecha: String(m.fecha).slice(0, 10),
+        idcategoria: m.idcategoria,
+        descripcion: m.descripcion ?? "",
+        estado: ESTADO_CONFIRMADO,
+      },
+      true
+    );
+    setMarcandoId(null);
+  }
 
   // Exporta lo que se ve en pantalla (respeta el filtro y el buscador).
   async function exportar(formato) {
@@ -284,6 +310,20 @@ export function MovimientosTemplate({
                           {esIngreso ? "Pendiente de cobro" : "Pendiente de pago"}
                         </em>}
                       </small>
+                      {!esConfirmado(m) && (
+                        <button
+                          type="button"
+                          className="marcar"
+                          disabled={marcandoId === m.id}
+                          onClick={() => confirmar(m)}
+                        >
+                          {marcandoId === m.id
+                            ? "Guardando..."
+                            : esIngreso
+                            ? "✓ Marcar como cobrado"
+                            : "✓ Marcar como pagado"}
+                        </button>
+                      )}
                     </div>
                     <span className={`monto ${esIngreso ? "ingreso" : "gasto"}`}>
                       {esIngreso ? "+" : "-"} {formatearMonto(m.valor, moneda)}
@@ -384,6 +424,27 @@ const Lista = styled.ul`
     }
     small {
       color: ${({ theme }) => theme.colorSubtitle};
+    }
+    .marcar {
+      align-self: flex-start;
+      margin-top: 6px;
+      padding: 4px 12px;
+      font-size: 0.8em;
+      border: 1px solid ${({ theme }) => theme.primary};
+      border-radius: 999px;
+      background: transparent;
+      color: ${({ theme }) => theme.primary};
+      cursor: pointer;
+      transition: 0.2s;
+
+      &:hover:not(:disabled) {
+        background: ${({ theme }) => theme.primary};
+        color: #18121f;
+      }
+      &:disabled {
+        opacity: 0.5;
+        cursor: wait;
+      }
     }
     .pendiente {
       margin-left: 8px;
